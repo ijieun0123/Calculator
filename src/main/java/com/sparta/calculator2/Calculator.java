@@ -3,7 +3,7 @@ package com.sparta.calculator2;
 import java.util.ArrayList;
 
 public class Calculator {
-    ArrayList<Integer> resultsArrayList;
+    private ArrayList<Integer> resultsArrayList;
 
     public ArrayList<Integer> getResultsArrayList() {
         return resultsArrayList;
