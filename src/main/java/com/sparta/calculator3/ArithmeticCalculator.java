@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ArithmeticCalculator <T extends Number>{
+public class ArithmeticCalculator<T extends Number> {
     private ArrayList<T> resultsArrayList = new ArrayList<>();
 
     public ArrayList<T> getResultsArrayList() {
@@ -15,24 +15,48 @@ public class ArithmeticCalculator <T extends Number>{
         this.resultsArrayList = resultsArrayList;
     }
 
-    public Number calculate(char operator, T firstNum, T secondNum){
+    @SuppressWarnings("unchecked")
+    public T calculate(OperatorType operator, T firstNum, T secondNum) {
         double result = 0;
-        if(operator == OperatorType.ADD.getOperator()) {
-            result = firstNum.doubleValue() + secondNum.doubleValue();
-        } else if(operator == OperatorType.SUBSTRACT.getOperator()){
-            result = firstNum.doubleValue() - secondNum.doubleValue();
-        } else if(operator == OperatorType.MULTIPLY.getOperator()){
-            result = firstNum.doubleValue() * secondNum.doubleValue();
-        } else if(operator == OperatorType.DIVIDE.getOperator()){
-            if (secondNum.doubleValue() == 0) {
-                throw new ArithmeticException("Cannot divide by zero");
-            }
-            result = firstNum.doubleValue() / secondNum.doubleValue();
+
+        switch (operator) {
+            case ADD:
+                result = firstNum.doubleValue() + secondNum.doubleValue();
+                break;
+            case SUBSTRACT:
+                result = firstNum.doubleValue() - secondNum.doubleValue();
+                break;
+            case MULTIPLY:
+                result = firstNum.doubleValue() * secondNum.doubleValue();
+                break;
+            case DIVIDE:
+                if (secondNum.doubleValue() == 0) {
+                    throw new ArithmeticException("Cannot divide by zero");
+                }
+                result = firstNum.doubleValue() / secondNum.doubleValue();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid operator");
         }
-        return result;
+
+        return convertToSpecificType(result, (Class<T>) firstNum.getClass());
     }
 
-    public void removeResult(){
+    private <T extends Number> T convertToSpecificType(double value, Class<T> type) {
+        if (type == Integer.class) {
+            return type.cast((int) value);
+        } else if (type == Double.class) {
+            return type.cast(value);
+        } else if (type == Float.class) {
+            return type.cast((float) value);
+        } else if (type == Long.class) {
+            return type.cast((long) value);
+        } else {
+            throw new UnsupportedOperationException("Unsupported type: " + type.getName());
+        }
+    }
+
+    public void removeResult() {
         if (!resultsArrayList.isEmpty()) {
             resultsArrayList.remove(0);
         } else {
@@ -40,12 +64,9 @@ public class ArithmeticCalculator <T extends Number>{
         }
     }
 
-    public List<Double> returnBigNumber(double inputNum, ArrayList<Number> resultArrayList){
-        List<Double> filterList = resultArrayList.stream()
-                .filter(n -> n.doubleValue() > inputNum)  // doubleValue()로 변환하여 비교
-                .map(n -> n.doubleValue())  // 결과를 Double로 변환
+    public List<Double> returnBigNumber(double inputNum, ArrayList<Double> resultArrayList) {
+        return resultArrayList.stream()
+                .filter(n -> n > inputNum)
                 .collect(Collectors.toList());
-
-        return filterList;
     }
 }
